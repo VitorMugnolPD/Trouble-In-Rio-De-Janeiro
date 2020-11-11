@@ -1,0 +1,294 @@
+<!DOCTYPE HTML>  <!--autores: Vicente Pinto Tomás Junior(RA19199), e Vitor Mugnol Estevam de Araujo(RA19200)!-->
+<html>
+
+<head>
+    <title>Animação</title>
+    <link rel="stylesheet" href="estilo.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script language="JavaScript" type="text/javascript">
+
+        $().ready(function(){
+            $("#pastel").hide();
+            $("canvas").hide();
+            var m = new sound("musicaFundo.mp3");
+            setTimeout(function(){
+                m.play();
+            },500);
+        })
+
+        var cod = new Array(38,38,40,40,37,39,37,39,66,65,13);
+        var codP = new Array(0,0,0,0,0,0,0,0,0,0,0);
+
+        var beicolaEsta = false;
+        var perder = false;
+
+        var contTecla = 0;
+        var contFome = 0;
+
+        var p;
+
+        var pont = 0;
+        var velocidadeMonstro = 500;
+
+        var objCanvas = null; 
+        var objContexto = null; 
+
+        var xHeroi = 100;
+        var yHeroi = 100;
+
+        var xMonstro = 200;
+        var yMonstro = 100;
+
+        var xMoeda = 500;
+        var yMoeda = 100;
+
+        var xBeicola = 400;
+        var yBeicola = 300;
+
+        var imgFundo = new Image();
+        imgFundo.src = "img/fundo.png";
+
+        var imgHeroi = new Image();
+        imgHeroi.src = "img/ag2.png";
+
+        var imgMonstro = new Image();
+        imgMonstro.src = "img/lineu2.png";
+
+        var imgMoeda = new Image();
+        imgMoeda.src = "img/pastel2.png";
+
+        var imgBeicola = new Image();
+        imgBeicola.src = "img/beicola2.png";
+
+        function AtualizaTela() {
+            objContexto.drawImage(imgFundo, 0, 0);
+            objContexto.drawImage(imgHeroi, xHeroi, yHeroi);
+            objContexto.drawImage(imgMonstro, xMonstro, yMonstro);
+            objContexto.drawImage(imgMoeda, xMoeda, yMoeda);
+            if(pont >= 15)
+            {
+                objContexto.drawImage(imgBeicola, xBeicola, yBeicola);
+                if(pont == 15)
+                {
+                    beicolaEsta = true;
+                }
+            }
+            if(yHeroi >= 420)
+                yHeroi -= 10;
+            if(yHeroi <= 15)
+                yHeroi += 10;
+            if(xHeroi >= 810)
+                xHeroi -= 10;
+            if(xHeroi <= 25)
+                xHeroi += 10;
+            if(yMonstro >= 420)
+                yMonstro -= 10;
+            if(yMonstro <= 15)
+                yMonstro += 10;
+            if(xMonstro >= 810)
+                xMonstro -= 10;
+            if(xMonstro <= 25)
+                xMonstro += 10;
+            if(yBeicola >= 420)
+                yBeicola -= 10;
+            if(yBeicola <= 15)
+                yBeicola += 10;
+            if(xBeicola >= 810)
+                xBeicola -= 10;
+            if(xBeicola <= 25)
+                xBeicola += 10;
+            if(xMonstro > xHeroi - 25 && xMonstro < xHeroi + 25 && yMonstro > yHeroi - 25  && yMonstro < yHeroi + 25 ||
+            xBeicola > xHeroi - 20 && xBeicola < xHeroi + 20 && yBeicola > yHeroi - 20  && yBeicola < yHeroi + 20 && beicolaEsta)
+            {
+                xHeroi = 20;
+                yHeroi = 20;
+                xMonstro = 100;
+                yMonstro = 200;
+                perder = true;
+                if(pont >= 35)
+                    alert("Parebéns!!!\nVocê conseguiu " + pont.toString() + " pastéis a agora o Lineu está magoado!");
+                else
+                    alert("Você foi pego pelo Lineu e sua gangue!\nVocê conseguiu pegar " + pont.toString() + " pastéis!"); 
+
+                location.reload();
+            }
+            if(xHeroi > xMoeda - 30 && xHeroi < xMoeda + 30 && yHeroi > yMoeda - 30  && yHeroi < yMoeda + 30)
+            {
+                xMoeda = Math.floor(Math.random() * 8)* 100;
+                yMoeda = Math.floor(Math.random() * 4)* 100;
+                pont++;
+                document.getElementById("pontuação").innerHTML = pont.toString();
+                if(pont >= 25)
+                {
+                    if(pont == 25)
+                        p = pont;
+                    window.setInterval('MovimentoDoMonstro()', velocidadeMonstro - (velocidadeMonstro * p / 100));                   
+                }
+                else
+                    window.setInterval('MovimentoDoMonstro()', velocidadeMonstro - (velocidadeMonstro * pont / 100));
+                Fome();
+            }
+            if(yMoeda >= 420)
+                yMoeda -= 10;
+            if(yMoeda <= 15)
+                yMoeda += 10;
+            if(xMoeda >= 810)
+                xMoeda -= 10;
+            if(xMoeda <= 25)
+                xMoeda += 10;
+            if(pont >= 20)
+            {
+                $("body").attr("onkeydown","TeclasTaxi()");
+            }           
+        }
+
+        function Iniciar() {
+            objCanvas = document.getElementById("meuCanvas");
+            objContexto = objCanvas.getContext("2d");
+            AtualizaTela();
+            $("#titulo").hide();
+            $("#explicacoes").hide();
+            $("button").hide();
+            $("canvas").show();
+            $("#pastel").show();
+            
+            window.setInterval('MovimentoDoMonstro()', velocidadeMonstro);
+            window.setInterval('MovimentoDoBeicola()', 10);
+            Fome();
+
+        }
+
+        function MovimentoDoMonstro() {
+            var prop = Math.round(Math.random() * 10);
+            if(xHeroi > xMonstro && prop <= 6)
+                xMonstro += 2;
+            else
+                xMonstro -= 2;
+            if(xHeroi < xMonstro && prop <= 6)
+                xMonstro -= 2;
+            else
+                xMonstro += 2;
+            if(yHeroi > yMonstro && prop <= 6)
+                yMonstro += 2;
+            else
+                yMonstro -= 2;
+            if(yHeroi < yMonstro && prop <= 6)
+                yMonstro -= 2;
+            else
+                yMonstro += 2;
+            AtualizaTela();
+        }
+
+        function MovimentoDoBeicola(){
+            
+            if(xHeroi > xBeicola)
+                xBeicola += 1;          
+            if(xHeroi < xBeicola)
+                xBeicola -= 1;
+            if(yHeroi > yBeicola)
+                yBeicola += 1;        
+            if(yHeroi < yBeicola)
+                yBeicola -= 1;
+            AtualizaTela();
+        }
+
+        function Teclas() {
+            var tecla = event.keyCode;
+            switch (tecla) {
+                case 37: xHeroi = (xHeroi - 10); break;
+                case 38: yHeroi = (yHeroi - 10); break;
+                case 39: xHeroi = (xHeroi + 10); break;
+                case 40: yHeroi = (yHeroi + 10); break;
+            }
+            if(contTecla < 12)
+            {
+                codP[contTecla] = event.keyCode;
+                contTecla++;
+            }
+            if(contTecla == 11)
+            if(Vets())
+            {
+                alert("Boa tentativa, mas hoje não");
+                Iniciar();
+            }
+            AtualizaTela();
+        }
+
+        function Vets(){
+            var a = true;
+            for(var i = 0; i <= 11; i++)
+            {
+                if(codP[i] != cod[i])
+                    a = false;
+            }
+            if(a)
+                velocidadeMonstro = 50;
+            return a;
+        }
+
+        function TeclasTaxi(){
+            var tecla = event.keyCode;
+            switch (tecla) {
+                case 37: xHeroi = (xHeroi - 15); 
+                    imgHeroi.src = "img/taxiEsquerda.png";
+                    break;
+                case 38: yHeroi = (yHeroi - 15); 
+                    imgHeroi.src = "img/taxiCima.png";
+                    break;
+                case 39: xHeroi = (xHeroi + 15);
+                    imgHeroi.src = "img/taxiDireita.png";
+                    break;
+                case 40: yHeroi = (yHeroi + 15); 
+                    imgHeroi.src = "img/taxiBaixo.png";
+                    break;
+            }
+        }
+
+        function Fome(){
+            var x = pont;
+            window.setInterval(function(){
+                if(x == pont)
+                {
+                    if(!perder)
+                    {
+                        perder = true;
+                        alert("GAME OVER\n\nVocê deixou o Agostinho morrer de fome!!!");
+                        location.reload();
+                    }
+                }
+            }, 10000);            
+        }
+
+        function sound(src){
+            this.sound = document.createElement("audio");
+            this.sound.src = src;
+            this.sound.setAttribute("preload", "auto");
+            this.sound.setAttribute("controls", "none");
+            this.sound.setAttribute("loop", "none");
+            this.sound.style.display = "none";
+            document.body.appendChild(this.sound);
+            this.play = function(){
+                this.sound.play();
+            }
+            this.stop = function(){
+                this.sound.pause();
+            }
+        }
+
+    </script>
+</head>
+
+<body   onkeydown="Teclas()">
+    <canvas id="meuCanvas" width="862" height="480">
+        Seu browser não suporta o elemento CANVAS, atualize-se!!!
+    </canvas>
+    <BR>
+    <center><div id="titulo">TROUBLE IN RIO DE JANEIRO</div><br>
+    <div id="txts"><button onClick="Iniciar();">Iniciar</button><br><br>
+    <div id="pastel">Pastéis: <div id="pontuação"></div></div>
+    <div id="explicacoes"><b>Tente conseguir o máximo de pastéis sem ser pego pelo Lineu e seus comparsas!!<br>Controle o Agostinho Carrara pelas setas do teclado<br>
+    Consiga mais do que 35 pastéis para vencer o Lineu!!<br>E não deixe o Agostinho sem comer por mais de 10 segundos!!</b></div></center>
+    </div>
+</body>
+
+</html>

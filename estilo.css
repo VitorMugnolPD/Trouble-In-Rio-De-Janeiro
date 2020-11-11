@@ -1,0 +1,42 @@
+body{
+    background-image: url("img/gta2.jpg");
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+#txts{
+    /* float: right; */
+}
+canvas{
+    float: left;
+}
+button{
+    color: white;
+    background-color: rgb(128, 0, 128);
+    font-size: 60px;
+    font-family: "Algerian";
+    border-radius: 12px;
+    transition: 0.3s ease; 
+}
+button:hover{
+    font-size: 70px;
+    transition: 0.3s ease; 
+}
+#pastel{
+    font-family: "Algerian";
+    font-size: 50px;
+    color: rgb(0, 255, 55);
+    float: right;
+    background-color: rgba(114, 114, 114, 0.486);
+}
+#explicacoes{
+    font-family: "Comic Sans MS";
+    font-size: 25px;
+    color: rgb(238, 255, 0);
+    background-color: rgba(114, 114, 114, 0.486);
+}
+#titulo{
+    font-family: "Algerian";
+    font-size: 90px;
+    color: red;
+    background-color: rgba(46, 45, 45, 0.349);
+}
